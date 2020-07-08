@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Demo</title>
+<style>
+#div1 {margin:10px;font-size:1.25em;}
+table {border-collapse:collapse;border:1px solid #7f7f7f;}
+td {border:1px solid #7f7f7f;width:50px;height:50px;text-align:center;}
+</style>
+</head>
+<body >
+
+<div id="div2">
+    <label for="wid">Number of columns</label>
+    <input id="wid" type="number">
+    <button onclick="draw()" type="button">Draw columns</button>
+</div>
+<div id="div1" draggable="true"></div>
+
+<script>
+function draw() {
+    //var width = document.getElementById("wid").value;
+    drawTable();
+    }
+    
+
+
+    function drawTable() {
+        var totalRows = 1;
+        var cellsInRow = document.getElementById("wid").value;
+        // alert(cellsInRow);
+        var min = 1;
+        var max = 10;
+        // get the reference for the body
+        var div1 = document.getElementById('div1');
+
+        // creates a <table> element
+        var tbl = document.createElement("table");
+        tbl.setAttribute('draggable', 'true');
+        // creating rows
+        for (var r = 0; r < totalRows; r++) {
+            var row = document.createElement("tr");
+                   
+                   // create cells in row
+             for (var c = 0; c < cellsInRow; c++) {
+                var cell = document.createElement("td");
+                cell.setAttribute('draggable', 'true');
+                cell.setAttribute('contenteditable','true');
+                 getRandom = Math.floor(Math.random() * (max - min + 1)) + min;
+                var cellText = document.createTextNode(Math.floor(Math.random() * (max - min + 1)) + min);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+            }           
+            
+              tbl.appendChild(row); // add the row to the end of the table body
+        }
+    
+     div1.appendChild(tbl); // appends <table> into <div1>
+     makeResizable();
+}
+//window.onload=drawTable;
+
+function makeResizable(tb1)
+{
+var table = document.getElementsByTagName('table')[0];
+resizableGrid(table);
+}
+
+function resizableGrid(table) {
+var row = table.getElementsByTagName('tr')[0],
+cols = row ? row.children : undefined;
+if (!cols) return;
+
+ table.style.overflow = 'hidden';
+
+ var tableHeight = table.offsetHeight;
+
+ for (var i=0;i<cols.length;i++){
+  var div = createDiv(tableHeight);
+  cols[i].appendChild(div);
+  cols[i].style.position = 'relative';
+  setListeners(div);
+}
+
+function setListeners(div){
+  var pageX,curCol,nxtCol,curColWidth,nxtColWidth;
+
+  div.addEventListener('mousedown', function (e) {
+   curCol = e.target.parentElement;
+   nxtCol = curCol.nextElementSibling;
+   pageX = e.pageX; 
+ 
+   var padding = paddingDiff(curCol);
+
+   curColWidth = curCol.offsetWidth - padding;
+   if (nxtCol)
+    nxtColWidth = nxtCol.offsetWidth - padding;
+  });
+
+  div.addEventListener('mouseover', function (e) {
+   e.target.style.borderRight = '2px solid #0000ff';
+  })
+
+  div.addEventListener('mouseout', function (e) {
+   e.target.style.borderRight = '';
+  })
+
+  document.addEventListener('mousemove', function (e) {
+   if (curCol) {
+    var diffX = e.pageX - pageX;
+
+    if (nxtCol)
+     nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+
+    curCol.style.width = (curColWidth + diffX)+'px';
+   }
+  });
+
+  document.addEventListener('mouseup', function (e) { 
+   curCol = undefined;
+   nxtCol = undefined;
+   pageX = undefined;
+   nxtColWidth = undefined;
+   curColWidth = undefined
+  });
+}
+
+ function createDiv(height){
+  var div = document.createElement('div');
+  div.style.top = 0;
+  div.style.right = 0;
+  div.style.width = '5px';
+  div.style.position = 'absolute';
+  div.style.cursor = 'col-resize';
+  div.style.userSelect = 'none';
+  div.style.height = height + 'px';
+  return div;
+}
+
+ function paddingDiff(col){
+
+  if (getStyleVal(col,'box-sizing') == 'border-box'){
+   return 0;
+  }
+
+  var padLeft = getStyleVal(col,'padding-left');
+  var padRight = getStyleVal(col,'padding-right');
+  return (parseInt(padLeft) + parseInt(padRight));
+
+}
+
+function getStyleVal(elm,css){
+  return (window.getComputedStyle(elm, null).getPropertyValue(css))
+}
+};
+
+</script>
